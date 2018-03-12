@@ -40,6 +40,11 @@ class GameNewSerializer(serializers.Serializer):
     mines = serializers.IntegerField(min_value=1)
 
 
+class GameFieldSerializer(serializers.Serializer):
+    x = serializers.IntegerField(min_value=0)
+    y = serializers.IntegerField(min_value=0)
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:

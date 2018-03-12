@@ -7,13 +7,6 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from api.permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-
-
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        return  # To not perform the csrf check previously happening
-
 
 class GameViewSet(viewsets.ViewSet):
     """
@@ -56,7 +49,6 @@ class GameViewSet(viewsets.ViewSet):
     """
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly,)
-    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
 
     def get(self, request, pk, format=None):
         queryset = Game.objects.all()

@@ -7,7 +7,12 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from api.permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
 
 
 class GameViewSet(viewsets.ViewSet):
@@ -51,32 +56,28 @@ class GameViewSet(viewsets.ViewSet):
     """
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly,)
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
 
-    @csrf_exempt
     def get(self, request, pk, format=None):
         queryset = Game.objects.all()
         game = get_object_or_404(queryset, pk=pk)
         serializer = GameSerializer(game)
         return Response(serializer.data)
 
-    @csrf_exempt
     def list(self, request):
         queryset = Game.objects.all()
         serializer = GameSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @csrf_exempt
     def get_object(self, pk):
         return get_object_or_404(Game, pk=pk)
 
-    @csrf_exempt
     @detail_route(methods=['get'])
     def state(self, request, pk=None):
         game = self.get_object(pk)
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @list_route(methods=['get','post'])
     def new(self, request, *args, **kwargs):
         serializer = GameNewSerializer(data=request.data)
@@ -97,7 +98,6 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @detail_route(methods=['post'])
     def tick(self, request, pk=None):
         """Gets a clock tick from the client. Each tick represents a second passed by during the game.
@@ -110,7 +110,6 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @detail_route(methods=['post'])
     def pause(self, request, pk=None):
         game = self.get_object(pk)
@@ -119,7 +118,6 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @detail_route(methods=['post'])
     def resume(self, request, pk=None):
         game = self.get_object(pk)
@@ -129,7 +127,6 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @detail_route(methods=['post'])
     def mark_as_flag(self, request, pk=None):
         serializer = GameFieldSerializer(data=request.data)
@@ -142,7 +139,6 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @detail_route(methods=['post'])
     def mark_as_question(self, request, pk=None):
         serializer = GameFieldSerializer(data=request.data)
@@ -155,7 +151,6 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @csrf_exempt
     @detail_route(methods=['post'])
     def reveal(self, request, pk=None):
         serializer = GameFieldSerializer(data=request.data)

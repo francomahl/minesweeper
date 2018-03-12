@@ -24,11 +24,11 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        queryset = Game.objects.all()
-        game = get_object_or_404(queryset, pk=pk)
-        serializer = GameSerializer(game)
-        return Response(serializer.data)
+    # def retrieve(self, request, pk=None):
+    #     queryset = Game.objects.all()
+    #     game = get_object_or_404(queryset, pk=pk)
+    #     serializer = GameSerializer(game)
+    #     return Response(serializer.data)
 
     def get_object(self, pk):
         return get_object_or_404(Game, pk=pk)
@@ -40,7 +40,7 @@ class GameViewSet(viewsets.ViewSet):
         serializer = GameSerializer(game, context={'request': request})
         return Response(serializer.data)
 
-    @list_route(methods=['post'])
+    @list_route(methods=['get','post'])
     def new(self, request, *args, **kwargs):
         serializer = GameNewSerializer(data=request.data)
         game = None
